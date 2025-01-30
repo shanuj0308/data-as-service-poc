@@ -18,6 +18,7 @@ import {
   ArrowUpDown,
   ChevronDown,
   Columns3,
+  DownloadIcon,
   MoreHorizontal,
   RefreshCcw,
   SearchIcon,
@@ -43,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DownloadDialog } from "@/components/layout/download-dialog";
 
 const data: Payment[] = [
   {
@@ -227,7 +229,6 @@ export const columns: ColumnDef<Payment>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            
             <DropdownMenuItem
               onClick={() =>
                 navigator.clipboard.writeText(archiveData.application_folder)
@@ -239,6 +240,14 @@ export const columns: ColumnDef<Payment>[] = [
             <DropdownMenuItem>View Database</DropdownMenuItem>
             <DropdownMenuItem>View Reports</DropdownMenuItem>
             <DropdownMenuItem>View Folders</DropdownMenuItem>
+
+            <DownloadDialog
+              trigger={
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Download
+                </DropdownMenuItem>
+              }
+            />
           </DropdownMenuContent>
         </DropdownMenu>
       );
