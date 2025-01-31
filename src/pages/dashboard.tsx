@@ -240,14 +240,6 @@ export const columns: ColumnDef<Payment>[] = [
             <DropdownMenuItem>View Database</DropdownMenuItem>
             <DropdownMenuItem>View Reports</DropdownMenuItem>
             <DropdownMenuItem>View Folders</DropdownMenuItem>
-
-            <DownloadDialog
-              trigger={
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  Download
-                </DropdownMenuItem>
-              }
-            />
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -279,9 +271,11 @@ const Dashboard = () => {
       columnVisibility,
       rowSelection,
     },
-    // rowCount: data.length, // Set the number of rows per page
-    // pageCount: Math.ceil(data.length / 2), // Set the total number of pages
   });
+
+  const selectedRows = table
+    .getSelectedRowModel()
+    .rows.map((row) => row.original);
 
   return (
     <div className="flex items-center justify-center">
@@ -305,6 +299,29 @@ const Dashboard = () => {
               }
               className="max-w-sm"
             />
+            {/* Download Button */}
+            <DownloadDialog
+              selectedItems={selectedRows.map((row) => row.application_folder)}
+              trigger={
+                <Button
+                  variant={selectedRows.length > 0 ? "default" : "outline"}
+                  disabled={selectedRows.length === 0}
+                >
+                  <DownloadIcon className="mr-2 h-4 w-4" />
+                  Download
+                </Button>
+              }
+            />
+            {/* Reset Button */}
+            <Button
+              variant="outline"
+              disabled={selectedRows.length === 0}
+              onClick={() => table.resetRowSelection()}
+            >
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              Reset
+            </Button>
+            {/* Columns Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="ml-auto">
