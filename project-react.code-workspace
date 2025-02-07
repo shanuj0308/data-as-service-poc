@@ -25,7 +25,7 @@
 			"editor.defaultFormatter": "esbenp.prettier-vscode"
 		},
 		"javascript.preferences.importModuleSpecifier": "non-relative",
-		"window.zoomLevel": 5,
+		"window.zoomLevel": 1,
 		"git.enabled": true
 	}
 }

@@ -1,22 +1,21 @@
-import { Outlet } from "react-router-dom";
-import "./App.css";
-import Header from "./components/layout/header";
-import Footer from "./components/layout/footer";
-import { ThemeProvider } from "./context/theme-provider";
+import { Outlet } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Footer from '@/components/common/Footer';
+import Header from '@/components/common/Header';
+import { ThemeProvider } from '@/context/theme-provider';
 
 function App() {
   const queryClient = new QueryClient();
 
   return (
     <>
-      <div className="bg-gradient-to-br from-background to-muted">
+      <div className='bg-gradient-to-br from-background to-muted'>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
             <Header />
-            <main className="min-h-screen container mx-auto px-4 py-7">
+            <main className='container mx-auto min-h-screen px-4 py-7'>
               <Outlet />
             </main>
             <Footer />
