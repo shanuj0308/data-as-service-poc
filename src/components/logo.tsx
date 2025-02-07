@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import { User } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 export const Logo = ({ className, ...props }: React.ComponentProps<"div">) => {
   return (

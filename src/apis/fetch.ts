@@ -1,7 +1,7 @@
-import { API_CONFIG } from "./config";
+import { API_CONFIG } from './config';
 
 const fetchData = async <T>(url: string): Promise<T> => {
-  console.log("===", url);
+  console.log('===', url);
   const response = await fetch(url);
 
   if (!response.ok) {
