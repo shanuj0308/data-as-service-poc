@@ -10,6 +10,8 @@ import {
 import { Textarea } from '@/components/ui/text-area';
 import { Checkbox } from '@/components/ui/checkbox';
 
+import QueryResult from '../common/QueryResult';
+
 interface QueryEditorProps {
   schemas: string[];
   tables: string[];
@@ -33,6 +35,7 @@ export default function QueryEditor({
   const [selectedColumns, setSelectedColumns] = useState<string[]>(['*']);
   const [query, setQuery] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [queryResult, setQueryResult] = useState<any>(null);
 
   useEffect(() => {
     buildQuery();
@@ -78,6 +81,14 @@ export default function QueryEditor({
     if (selectedColumns.length > 3)
       return `${selectedColumns.slice(0, 3).join(', ')}, ...`;
     return selectedColumns.join(', ') || 'Select Columns';
+  };
+
+  const handleExecuteQuery = () => {
+    // Simulate query result
+    setQueryResult([
+      { id: 1, name: 'John Doe', age: 28 },
+      { id: 2, name: 'Jane Smith', age: 34 },
+    ]);
   };
 
   return (
@@ -185,19 +196,23 @@ export default function QueryEditor({
           <strong>Generated Query:</strong>
           <pre className='mt-2 whitespace-pre-wrap break-words'>{query}</pre>
         </div>
-
-        <div className='mt-4 flex justify-end gap-4'>
-          <Button onClick={onClose} variant='outline'>
-            Cancel
-          </Button>
-          <Button>Execute Query</Button>
-        </div>
-
-        <div className='mt-6 flex justify-center'>
+        <div className='mt-8 flex items-center justify-between'>
           <Button className='rounded-xl bg-blue-500 px-4 py-2 font-bold text-white shadow-md hover:bg-blue-700'>
             Click here to open QueryCanvas
           </Button>
+          <div className='flex gap-4'>
+            <Button onClick={onClose} variant='outline'>
+              Cancel
+            </Button>
+            <Button onClick={handleExecuteQuery}>Execute Query</Button>
+          </div>
         </div>
+
+        {queryResult && (
+          <div className='mt-6'>
+            <QueryResult data={queryResult} />
+          </div>
+        )}
       </div>
     </div>
   );
