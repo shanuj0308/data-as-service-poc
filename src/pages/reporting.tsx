@@ -5,6 +5,7 @@ import ReportingTopbar from "@/components/reportingComponents/reportingTopbar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/text-area";
+import QueryEditor from "../components/common/QueryEditor";
 
 function Reporting() {
   // State for dropdown values
@@ -21,6 +22,7 @@ function Reporting() {
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
   const [columnData, setColumnData] = useState<ColumnData[] | []>([]);
   const [selectedColumns, setSelectedColumns] = useState<{[key: string]: boolean}>({});
+  const [isQueryEditorOpen, setIsQueryEditorOpen] = useState(false);
 
   useEffect(() => {
     // Simulating an API call (Replace this with actual API fetch)
@@ -146,7 +148,15 @@ function Reporting() {
 
       <div className="flex flex-row justify-between pt-16">
       <div>
-          <Button> Open Query Editor </Button>
+      <Button onClick={() => setIsQueryEditorOpen(true)}>Open Query Editor</Button>
+      {isQueryEditorOpen && (
+  <QueryEditor
+    schemas={schemas}
+    tables={tables}
+    columns={columnData}
+    onClose={() => setIsQueryEditorOpen(false)}
+  />
+)}
       </div>
       <div className="flex w-[300px] justify-between">
       <Button> Execute Query </Button>
