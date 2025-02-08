@@ -74,11 +74,6 @@ export default function QueryEditor({
     }
   };
 
-  const handleDropdownClose = () => {
-    setIsDropdownOpen(false);
-    buildQuery();
-  };
-
   const getDisplayColumns = () => {
     if (selectedColumns.includes('*')) return 'All (*)';
     if (selectedColumns.length > 3)
@@ -87,6 +82,7 @@ export default function QueryEditor({
   };
 
   const handleExecuteQuery = () => {
+    //backend logic to be implemented using finalQuery.
     const finalQuery = isCustomQuery ? customQuery : query;
     setQueryResult([
       { id: 1, name: 'John Doe', age: 28 },
