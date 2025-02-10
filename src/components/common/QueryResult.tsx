@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface QueryResultProps {
-  data: Array<Record<string, any>>; // Safer type
+  data: Array<Record<string, unknown>>; 
 }
 
 export default function QueryResult({ data }: QueryResultProps) {

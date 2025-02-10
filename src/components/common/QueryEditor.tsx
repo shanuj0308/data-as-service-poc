@@ -1,5 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect,useState } from 'react';
+
+import QueryResult from '../common/QueryResult';
+
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -8,9 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/text-area';
-import { Checkbox } from '@/components/ui/checkbox';
-
-import QueryResult from '../common/QueryResult';
 
 interface QueryEditorProps {
   schemas: string[];
