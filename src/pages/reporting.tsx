@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/text-area";
 import QueryEditor from "../components/common/QueryEditor";
+import S3ConnectionSelector from '../components/common/S3Select'
 
 function Reporting() {
   // State for dropdown values
@@ -95,6 +96,9 @@ function Reporting() {
 
   return (
     <>
+    <div>
+      <S3ConnectionSelector></S3ConnectionSelector>
+    </div>
       <div className="place-self-center pb-4">Criteria</div>
       <ReportingTopbar
         schemas={schemas}
