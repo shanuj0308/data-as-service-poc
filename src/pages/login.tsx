@@ -5,17 +5,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { InteractionStatus } from '@azure/msal-browser';
+import { UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
+
+import { loginRequest } from '@/auth/authConfig';
 
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 
@@ -25,6 +22,18 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  /* Checking if user logged in */
+  const { instance, inProgress } = useMsal();
+
+  const handleLoginRedirect = () => {
+    instance
+      .loginPopup({
+        ...loginRequest,
+        prompt: 'create',
+      })
+      .catch((error) => console.log(error));
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       email: '',
@@ -35,8 +44,7 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = () => {
     navigate('/dashboard');
   };
 
@@ -45,15 +53,15 @@ const Login = () => {
       <div className='flex w-full max-w-sm flex-col items-center rounded-lg border p-6 shadow-sm'>
         <div className='flex items-center'>
           <Logo />
-          <p className='ml-4 text-xl font-bold tracking-tight'>
-            Log in to Kvue Vault
-          </p>
+          <p className='ml-4 text-xl font-bold tracking-tight'>Log in to Kvue Vault</p>
         </div>
 
-        <Button className='mt-8 w-full gap-3'>
-          <LogIn />
-          SSO Login
-        </Button>
+        <UnauthenticatedTemplate>
+          <Button onClick={handleLoginRedirect} className='mt-8 w-full gap-3'>
+            <LogIn />
+            {inProgress === InteractionStatus.Login ? 'Logging using popup' : 'SSO Login'}
+          </Button>
+        </UnauthenticatedTemplate>
 
         <div className='my-4 flex w-full items-center justify-center overflow-hidden'>
           <Separator />
@@ -62,10 +70,7 @@ const Login = () => {
         </div>
 
         <Form {...form}>
-          <form
-            className='w-full space-y-4'
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
+          <form className='w-full space-y-4' onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name='email'
@@ -73,12 +78,7 @@ const Login = () => {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type='email'
-                      placeholder='Email'
-                      className='w-full'
-                      {...field}
-                    />
+                    <Input type='email' placeholder='Email' className='w-full' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,12 +91,7 @@ const Login = () => {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type='password'
-                      placeholder='Password'
-                      className='w-full'
-                      {...field}
-                    />
+                    <Input type='password' placeholder='Password' className='w-full' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -109,10 +104,7 @@ const Login = () => {
         </Form>
 
         <div className='mt-5 space-y-5'>
-          <Link
-            to='#'
-            className='block text-center text-sm text-muted-foreground underline'
-          >
+          <Link to='#' className='block text-center text-sm text-muted-foreground underline'>
             Forgot your password?
           </Link>
         </div>

@@ -1,5 +1,6 @@
+import { Fragment } from 'react/jsx-runtime';
 import { Link } from 'react-router-dom';
-import { ChevronsRight } from 'lucide-react';
+import { ChevronsRight, Home } from 'lucide-react';
 
 import {
   Breadcrumb,
@@ -10,10 +11,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-const Breadcrumbs = ({ currentPage }: { currentPage: string }) => {
+export const BreadcrumbsWithBackground = ({ currentPage }: { currentPage: string }) => {
   return (
-    <Breadcrumb className='rounded-lg bg-secondary px-3 py-1'>
-      <BreadcrumbList className='text-2xl font-medium !leading-10 tracking-tight sm:text-3xl md:text-[20px] md:leading-[3.25rem]'>
+    <Breadcrumb className='rounded-lg bg-secondary px-2'>
+      <BreadcrumbList className='text-lg font-medium !leading-10 tracking-tight sm:text-xl md:text-[18px] md:leading-[3.25rem]'>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <Link to='/dashboard'>Dashboard</Link>
@@ -30,4 +31,33 @@ const Breadcrumbs = ({ currentPage }: { currentPage: string }) => {
   );
 };
 
-export default Breadcrumbs;
+export const BreadcrumbsWithIcon = ({ currentPath }: { currentPath: string }) => {
+  const pathSegments = currentPath.split('/').filter((segment) => segment !== '');
+  return (
+    <Breadcrumb>
+      {pathSegments.length >= 1 && (
+        <BreadcrumbList>
+          <>
+            <BreadcrumbItem key={'home'}>
+              <Home className='h-4 w-4' />
+            </BreadcrumbItem>
+          </>
+
+          {pathSegments.map((segment, index) => (
+            <Fragment key={`fragment-${index}`}>
+              <BreadcrumbSeparator key={`separator-${index}`}>
+                <ChevronsRight key={`separator-${index + 1}`} />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem key={`item-${index}`}>
+                {/* <BreadcrumbLink asChild>
+                <Link to={`/${pathSegments.slice(0, index + 1).join('/')}`}></Link>
+              </BreadcrumbLink> */}
+                {segment}
+              </BreadcrumbItem>
+            </Fragment>
+          ))}
+        </BreadcrumbList>
+      )}
+    </Breadcrumb>
+  );
+};

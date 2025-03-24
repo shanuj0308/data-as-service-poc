@@ -1,80 +1,54 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Combobox from "../ui/combobox";
 
-const ReportingTopbar = ({ 
-    schemas, 
-    tables, 
-    limits, 
-    setSelectedSchema, 
-    setSelectedDatabase, 
-    setSelectedLimit 
-  }) => {
-  return (
-    <>
-    <div className="flex flex-row justify-between">
-    <div className="flex flex-col">
-      <div>Application Name</div>
-      <div className="pt-3">APP0001-APPLICATION_NAME</div>
-    </div>
-
-    {/* Schema Dropdown */}
-    <div className="flex flex-col">
-      <div className="pb-2">Schema</div>
-      <Select onValueChange={setSelectedSchema}>
-        <SelectTrigger className="w-[240px]">
-          <SelectValue placeholder="Select Schema" />
-        </SelectTrigger>
-        <SelectContent>
-          {schemas.map((schema) => (
-            <SelectItem key={schema} value={schema}>
-              {schema}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-
-    {/* Table Dropdown */}
-    <div className="flex flex-col">
-      <div className="pb-2">Table</div>
-      <Select onValueChange={setSelectedDatabase}>
-        <SelectTrigger className="w-[240px]">
-          <SelectValue placeholder="Select Table" />
-        </SelectTrigger>
-        <SelectContent>
-          {tables.map((tb) => (
-            <SelectItem key={tb} value={tb}>
-              {tb}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-
-    {/* Limit Dropdown */}
-    <div className="flex flex-col">
-      <div className="pb-2">Limit</div>
-      <Select onValueChange={setSelectedLimit}>
-        <SelectTrigger className="w-[120px]">
-          <SelectValue placeholder="Select Limit" />
-        </SelectTrigger>
-        <SelectContent>
-          {limits.map((limit) => (
-            <SelectItem key={limit} value={limit}>
-              {limit}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-    </div>
-    </>
-  )
+interface ReportingTopbarProps {
+  schemas: string[];
+  tables: string[];
+  limits: string[];
+  setSelectedSchema: (value: string) => void;
+  setSelectedTable: (value: string) => void;
+  setSelectedLimit: (value: string) => void;
+  selectedSchema: string;
+  selectedTable: string;
+  selectedLimit: string;
+  databaseName: string;
+  tablesLoading: boolean;
+  schemasLoading: boolean;
 }
 
-export default ReportingTopbar
+const ReportingTopbar = ({
+  schemas,
+  tables,
+  limits,
+  setSelectedSchema,
+  setSelectedTable,
+  setSelectedLimit,
+  selectedSchema,
+  selectedTable,
+  selectedLimit,
+  databaseName,
+  tablesLoading,
+  schemasLoading
+}: ReportingTopbarProps) => {
+  return (
+    <div className='flex flex-row justify-between'>
+      <div className='flex flex-col'>
+        <div><strong>Database Name</strong></div>
+        <div className='pt-3'>{databaseName ? databaseName : "Database Loading..."}</div>
+      </div>
+      <div>
+      <div className="pb-2"> <strong>Schema</strong></div>
+      <Combobox label='Schema' items={schemas} selectedValue={selectedSchema} setSelectedValue={setSelectedSchema} isLoading={schemasLoading}/>
+      </div>
+      <div>
+      <div className="pb-2"> <strong>Table</strong></div>
+      <Combobox label='Table' items={tables} selectedValue={selectedTable} setSelectedValue={setSelectedTable} isLoading={tablesLoading}/>
+      </div>
+      <div>
+      <div className="pb-2"> <strong>Limit  <em>(Optional)</em></strong></div>
+      <Combobox label='Limit' items={limits} selectedValue={selectedLimit} setSelectedValue={setSelectedLimit} />
+      </div>
+    </div>
+  );
+};
+
+export default ReportingTopbar;

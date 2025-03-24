@@ -2,13 +2,7 @@ import { ReactNode, useState } from 'react';
 import { DownloadIcon, FolderOpenIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
 interface DownloadDialogProps {
@@ -16,18 +10,14 @@ interface DownloadDialogProps {
   trigger?: ReactNode;
 }
 
-export function DownloadDialog({
-  selectedItems,
-  trigger,
-}: DownloadDialogProps) {
+export function DownloadDialog({ selectedItems, trigger }: DownloadDialogProps) {
   const [filePath, setFilePath] = useState('');
   const estimatedSize = 'Calculating...';
 
   // Function to open native directory picker
   const selectFolder = async (): Promise<void> => {
     try {
-      const handle: FileSystemDirectoryHandle =
-        await window.showDirectoryPicker();
+      const handle: FileSystemDirectoryHandle = await window.showDirectoryPicker();
       setFilePath(handle.name);
     } catch (error) {
       console.error('Folder selection cancelled', error);
@@ -43,25 +33,19 @@ export function DownloadDialog({
         </DialogHeader>
         <div className='space-y-3'>
           <div className='grid gap-2'>
-            <label className='font-medium text-black dark:text-white'>
-              Selected Items
-            </label>
+            <label className='font-medium text-black dark:text-white'>Selected Items</label>
             <div className='rounded-md border border-gray-300 bg-white p-2 text-sm text-black dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
               {selectedItems.length} files
             </div>
           </div>
           <div className='grid gap-2'>
-            <label className='font-medium text-black dark:text-white'>
-              Estimated Size of Download
-            </label>
+            <label className='font-medium text-black dark:text-white'>Estimated Size of Download</label>
             <p className='rounded-md border border-gray-300 bg-white p-2 text-sm text-black dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
               {estimatedSize}
             </p>
           </div>
           <div className='grid gap-2'>
-            <label className='font-medium text-black dark:text-white'>
-              Save Location
-            </label>
+            <label className='font-medium text-black dark:text-white'>Save Location</label>
             <div className='flex items-center gap-2'>
               <Input
                 value={filePath}

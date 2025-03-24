@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Columns3,
-  MoreHorizontal,
-  RefreshCcw,
-  SearchIcon,
-} from 'lucide-react';
+import { ArrowUpDown, ChevronDown, Columns3, Loader2, MoreHorizontal, RefreshCcw, SearchIcon } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -32,129 +26,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ArchivedDataConstant, WebendpointConstant } from '@/constant/apiConstants';
+import { ArchivalData } from '@/types/common';
 
-const data: ArchivedData[] = [
-  { id: "1",
-    application_folder: "m5gr84i9",
-    completed_at: "11 / 11 / 2020",
-    legal_hold: "Yes",
-    type: "Structured",
-    gxp: "Gxp",
-  },
-  { 
-    id: "2",
-    application_folder: "3u1reuv4",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Gxp High",
-  },
-  { id: "3",
-    application_folder: "derv1ws0",
-    completed_at: "11 / 11 / 2020",
-    legal_hold: "Yes",
-    type: "Structured",
-    gxp: "Gxp Medium",
-  },
-  { id: "4",
-    application_folder: "5kma53ae",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Non-Gxp",
-  },
-  { id: "5",
-    application_folder: "bhqecj4p",
-    completed_at: "11 / 11 / 2022",
-    legal_hold: "Yes",
-    type: "Unstructured",
-    gxp: "Gxp",
-  },
-  { id: "6",
-    application_folder: "5kma53ae",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Non-Gxp",
-  },
-  { id: "7",
-    application_folder: "bhqecj4p",
-    completed_at: "11 / 11 / 2022",
-    legal_hold: "Yes",
-    type: "Unstructured",
-    gxp: "Gxp",
-  },
-  { id: "8",
-    application_folder: "5kma53ae",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Non-Gxp",
-  },
-  { id: "9",
-    application_folder: "bhqecj4p",
-    completed_at: "11 / 11 / 2022",
-    legal_hold: "Yes",
-    type: "Unstructured",
-    gxp: "Gxp",
-  },
-  { id: "10",
-    application_folder: "5kma53ae",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Non-Gxp",
-  },
-  { id: "11",
-    application_folder: "bhqecj4p",
-    completed_at: "11 / 11 / 2022",
-    legal_hold: "Yes",
-    type: "Unstructured",
-    gxp: "Gxp",
-  },
-  { id: "12",
-    application_folder: "5kma53ae",
-    completed_at: "10 / 11 / 2019",
-    legal_hold: "No",
-    type: "Unstructured",
-    gxp: "Non-Gxp",
-  },
-  { id: "13",
-    application_folder: "bhqecj4p",
-    completed_at: "11 / 11 / 2022",
-    legal_hold: "Yes",
-    type: "Unstructured",
-    gxp: "Gxp",
-  },
-];
-
-export type ArchivedData = {
-  id: string;
-  application_folder: string;
-  completed_at: string;
-  legal_hold: 'Yes' | 'No';
-  type: 'Structured' | 'Unstructured';
-  gxp: 'Gxp' | 'Gxp Medium' | 'Gxp High' | 'Non-Gxp';
+const fetchArchivedData = async () => {
+  const response = await fetch(WebendpointConstant.BASE_URL + WebendpointConstant.ARCHIVE_DATA_LISTING_URL);
+  if (!response.ok) throw new Error('Failed to fetch data');
+  const apiVal = await response.json();
+  return apiVal.data;
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const columns: ColumnDef<ArchivedData>[] = [
+export const columns: ColumnDef<ArchivalData>[] = [
   {
     id: 'select',
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
       />
@@ -170,53 +59,101 @@ export const columns: ColumnDef<ArchivedData>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'application_folder',
-    header: 'App Folder',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('application_folder')}</div>
-    ),
-  },
-  {
-    accessorKey: 'type',
+    accessorKey: ArchivedDataConstant.ARCHIVE_NAME,
     header: ({ column }) => {
       return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Type
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>App Name</strong>
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('type')}</div>,
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.ARCHIVE_NAME)}</div>,
   },
   {
-    accessorKey: 'completed_at',
-    header: 'Completed At',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('completed_at')}</div>
-    ),
+    accessorKey: ArchivedDataConstant.DATABASE_ENGINE,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>Archival Type</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.DATABASE_ENGINE)}</div>,
   },
   {
-    accessorKey: 'legal_hold',
-    header: 'Legal Hold',
-    cell: ({ row }) => (
-      <div className='capitalize'>{row.getValue('legal_hold')}</div>
-    ),
+    accessorKey: ArchivedDataConstant.TIME_SUBMITTED,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>Completed On</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const dateString: Date = row.getValue(ArchivedDataConstant.TIME_SUBMITTED);
+      const date = new Date(dateString);
+      const formattedDate = date.toLocaleDateString();
+      return <div className='capitalize'>{formattedDate}</div>;
+    },
   },
   {
-    accessorKey: 'gxp',
-    header: 'GxP',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('gxp')}</div>,
+    accessorKey: ArchivedDataConstant.RETENTION_POLICY,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>Retention Policy</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.RETENTION_POLICY)}</div>,
+  },
+  {
+    accessorKey: ArchivedDataConstant.EXPIRATION_DATE,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>Expiration Date</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.EXPIRATION_DATE)}</div>,
+  },
+  {
+    accessorKey: ArchivedDataConstant.LEGAL_HOLD,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>Legal Hold</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.LEGAL_HOLD)}</div>,
+  },
+  {
+    accessorKey: ArchivedDataConstant.GXP,
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' className='pl-0' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          <strong>GxP</strong>
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue(ArchivedDataConstant.GXP)}</div>,
   },
   {
     id: 'actions',
-    header: 'Actions',
+    header: () => <strong>Actions</strong>,
     enableHiding: false,
     cell: ({ row }) => {
       const archiveData = row.original;
-      const isStructuredArchival =  archiveData.type.toLowerCase() === 'structured';
+      const isStructuredArchival = archiveData.archival_type?.toLowerCase() === 'structured';
 
       return (
         <DropdownMenu>
@@ -227,22 +164,18 @@ export const columns: ColumnDef<ArchivedData>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
-            <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(archiveData.application_folder)
-              }
-            >
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(archiveData.app_name)}>
               Copy App Folder
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Database</DropdownMenuItem>
-            <DropdownMenuItem>View Reports</DropdownMenuItem>
-            { isStructuredArchival && <DropdownMenuItem>
-              <Link to={`/structured-reporting/${archiveData.id}`}>
-                  Structured Reporting
+            {isStructuredArchival && (
+              <DropdownMenuItem>
+                <Link to={`/execute-query?archive_name=${archiveData.app_name}&archive_id=${archiveData.id}`}>
+                  Execute Query
                 </Link>
-            </DropdownMenuItem>}
-            {archiveData.type === 'Unstructured' && (
+              </DropdownMenuItem>
+            )}
+            {archiveData.archival_type === 'Unstructured' && (
               <DropdownMenuItem>
                 <Link to='/unstructured'>View Folders</Link>
               </DropdownMenuItem>
@@ -261,8 +194,13 @@ const Dashboard = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['dashboardList'],
+    queryFn: fetchArchivedData,
+  });
+
   const table = useReactTable({
-    data,
+    data: data || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -280,9 +218,30 @@ const Dashboard = () => {
     },
   });
 
+  if (isLoading) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <div className='flex flex-col items-center gap-2'>
+          <Loader2 className='h-8 w-8 animate-spin text-primary' />
+          <p className='text-sm text-muted-foreground'>Loading data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        <div className='flex flex-col items-center gap-2 text-destructive'>
+          <p>Error loading data.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex items-center justify-center'>
-      <div className='mx-auto w-full max-w-screen-lg px-6'>
+      <div className='mx-auto w-full'>
         <h1 className='text-2xl font-medium leading-10 tracking-tight sm:text-3xl md:text-[30px] md:leading-[3.25rem]'>
           Archival Dashboard
         </h1>
@@ -290,18 +249,11 @@ const Dashboard = () => {
           <div className='flex items-center gap-2 py-4'>
             <Input
               placeholder='Filter apps...'
-              value={
-                (table
-                  .getColumn('application_folder')
-                  ?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table
-                  .getColumn('application_folder')
-                  ?.setFilterValue(event.target.value)
-              }
+              value={(table.getColumn('app_name')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('app_name')?.setFilterValue(event.target.value)}
               className='max-w-sm'
             />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant='outline' className='ml-auto'>
@@ -324,12 +276,7 @@ const Dashboard = () => {
                   .getAllColumns()
                   .filter((column) => column.getCanHide())
                   .map((column) => {
-                    if (
-                      searchQuery &&
-                      !column.id
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                    ) {
+                    if (searchQuery && !column.id.toLowerCase().includes(searchQuery.toLowerCase())) {
                       return null;
                     }
 
@@ -338,9 +285,7 @@ const Dashboard = () => {
                         key={column.id}
                         className='capitalize'
                         checked={column.getIsVisible()}
-                        onCheckedChange={(value) =>
-                          column.toggleVisibility(!!value)
-                        }
+                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
                         onSelect={(e) => e.preventDefault()}
                       >
                         {column.id}
@@ -359,6 +304,7 @@ const Dashboard = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
           <div className='rounded-md border'>
             <Table>
               <TableHeader>
@@ -369,10 +315,7 @@ const Dashboard = () => {
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
                       );
                     })}
@@ -382,27 +325,15 @@ const Dashboard = () => {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                      className='odd:bg-muted/50'
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className='odd:bg-muted/50'>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className='h-24 text-center'
-                    >
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
                       No results.
                     </TableCell>
                   </TableRow>
@@ -412,8 +343,8 @@ const Dashboard = () => {
           </div>
           <div className='flex items-center justify-end space-x-2 py-4'>
             <div className='flex-1 text-sm text-muted-foreground'>
-              {table.getFilteredSelectedRowModel().rows.length} of{' '}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+              {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+              selected.
             </div>
             <div className='space-x-2'>
               <Button
@@ -424,12 +355,7 @@ const Dashboard = () => {
               >
                 Previous
               </Button>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
+              <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                 Next
               </Button>
             </div>

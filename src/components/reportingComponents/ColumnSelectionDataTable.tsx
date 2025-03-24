@@ -1,79 +1,70 @@
-import { useState, useEffect } from "react";
+import { useState } from 'react';
+import { ArrowUpDown } from 'lucide-react';
 import {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
-} from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ArrowUpDown } from "lucide-react";
+  VisibilityState,
+} from '@tanstack/react-table';
 
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export type ColumnData = {
   id: string;
   column: string;
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
+ 
 export const columns: ColumnDef<ColumnData>[] = [
   {
-    id: "select",
+    id: 'select',
     header: ({ table }) => (
       <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label='Select all'
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label='Select row'
       />
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "column",
+    accessorKey: 'column',
     header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Type
-            <ArrowUpDown />
-          </Button>
-        );
-      },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("column")}</div>
-    ),
-  }
+      return (
+        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Columns
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('column')}</div>,
+  },
 ];
 
-const ColumnSelectionDataTable = ({columnData, rowSelection, setRowSelection}) => {
+interface ColumnSelectionDataTableProps {
+  columnData: { id: string; column: string }[];
+  rowSelection: { [key: string]: boolean };
+  setRowSelection: any;
+}
+
+const ColumnSelectionDataTable = ({ columnData, rowSelection, setRowSelection }: ColumnSelectionDataTableProps) => {
   const data = columnData;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -99,26 +90,18 @@ const ColumnSelectionDataTable = ({columnData, rowSelection, setRowSelection}) =
   });
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="mx-auto">
-        <div className="">
-          <div className="flex items-center gap-2 py-4">
+    <div className='flex items-center justify-center'>
+      <div className='mx-auto'>
+        <div className=''>
+          <div className='flex items-center gap-2 py-4'>
             <Input
-              placeholder="Filter Columns..."
-              value={
-                (table
-                  .getColumn("column")
-                  ?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table
-                  .getColumn("column")
-                  ?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm"
+              placeholder='Filter Columns...'
+              value={(table.getColumn('column')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('column')?.setFilterValue(event.target.value)}
+              className='max-w-sm'
             />
           </div>
-          <div className="rounded-md border">
+          <div className='rounded-md border'>
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -128,10 +111,7 @@ const ColumnSelectionDataTable = ({columnData, rowSelection, setRowSelection}) =
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
                       );
                     })}
@@ -141,27 +121,15 @@ const ColumnSelectionDataTable = ({columnData, rowSelection, setRowSelection}) =
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                      className="odd:bg-muted/50"
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className='odd:bg-muted/50'>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
                       No results.
                     </TableCell>
                   </TableRow>
@@ -169,26 +137,21 @@ const ColumnSelectionDataTable = ({columnData, rowSelection, setRowSelection}) =
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
+          <div className='flex items-center justify-end space-x-2 py-4'>
+            <div className='flex-1 text-sm text-muted-foreground'>
+              {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
+              selected.
             </div>
-            <div className="space-x-2">
+            <div className='space-x-2'>
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
                 Previous
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
+              <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                 Next
               </Button>
             </div>

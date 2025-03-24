@@ -8,7 +8,8 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:@typescript-eslint/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  // ignore dist, eslint config, and test files
+  ignorePatterns: ['dist', '.eslintrc.cjs', '**/*.test.ts'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
@@ -25,23 +26,19 @@ module.exports = {
     'react/no-unescaped-entities': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-explicit-any': 'off', // Allows any type
     'simple-import-sort/imports': [
       'error',
       {
         groups: [
           // Packages `react` related packages come first.
-          [
-            '^react',
-            '^\\w',
-            '^@hookform',
-            '^@radix-ui',
-            '^@tanstack',
-            '@vitejs',
-          ],
+          ['^react', '^\\w', '^@hookform', '^@radix-ui', '^@tanstack', '@vitejs', '@azure', '@testing-library'],
           // npm packages
           // Anything that starts with a letter (or digit or underscore), or `@` followed by a letter.
           // ['^\\w'],
           // Internal packages.
+          ['^@/auth(/.*|$)'],
+          ['^@/context(/.*|$)'],
           ['^@store(/.*|$)'],
           ['^@components(/.*|$)'],
           ['^@ui(/.*|$)'],

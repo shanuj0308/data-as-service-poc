@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  ArrowUpDown,
-  DownloadIcon,
-  FileText,
-  FolderOpen,
-  RefreshCcw,
-} from 'lucide-react';
+import { ArrowUpDown, DownloadIcon, FileText, FolderOpen, RefreshCcw } from 'lucide-react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -19,19 +13,12 @@ import {
   VisibilityState,
 } from '@tanstack/react-table';
 
-import BreadcrumbsWithBackground from '@/components/common/Breadcrumbs';
+import { BreadcrumbsWithBackground } from '@/components/common/Breadcrumbs';
 import { DownloadDialog } from '@/components/common/DownloadDialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import data from '@/constant/explorerData';
 import { ExplorerData, ExplorerItem } from '@/types/explorerDataTypes';
 
@@ -41,10 +28,7 @@ const Unstructured = () => {
       id: 'select',
       header: ({ table }) => (
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label='Select all'
         />
@@ -67,16 +51,9 @@ const Unstructured = () => {
 
         return (
           <div className='flex items-center'>
+            {isFolder ? <FolderOpen className='mr-2' /> : <FileText className='mr-2' />}
             {isFolder ? (
-              <FolderOpen className='mr-2' />
-            ) : (
-              <FileText className='mr-2' />
-            )}
-            {isFolder ? (
-              <Button
-                variant='link'
-                onClick={() => handleFolderClick(row.original)}
-              >
+              <Button variant='link' onClick={() => handleFolderClick(row.original)}>
                 {row.getValue('item_name')}
               </Button>
             ) : (
@@ -90,32 +67,23 @@ const Unstructured = () => {
       accessorKey: 'item_type',
       header: ({ column }) => {
         return (
-          <Button
-            variant='ghost'
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
+          <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
             Type
             <ArrowUpDown />
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className='capitalize'>{row.getValue('item_type')}</div>
-      ),
+      cell: ({ row }) => <div className='capitalize'>{row.getValue('item_type')}</div>,
     },
     {
       accessorKey: 'last_accessed',
       header: 'last accessed',
-      cell: ({ row }) => (
-        <div className='capitalize'>{row.getValue('last_accessed')}</div>
-      ),
+      cell: ({ row }) => <div className='capitalize'>{row.getValue('last_accessed')}</div>,
     },
     {
       accessorKey: 'size',
       header: 'Size',
-      cell: ({ row }) => (
-        <div className='capitalize'>{row.getValue('size')}</div>
-      ),
+      cell: ({ row }) => <div className='capitalize'>{row.getValue('size')}</div>,
     },
   ];
 
@@ -123,8 +91,7 @@ const Unstructured = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [currentDirectory, setCurrentDirectory] =
-    useState<ExplorerData[]>(data);
+  const [currentDirectory, setCurrentDirectory] = useState<ExplorerData[]>(data);
   const [directoryStack, setDirectoryStack] = useState<ExplorerData[][]>([]);
 
   const handleFolderClick = (folder: ExplorerItem) => {
@@ -161,9 +128,7 @@ const Unstructured = () => {
     },
   });
 
-  const selectedRows = table
-    .getSelectedRowModel()
-    .rows.map((row) => row.original);
+  const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
 
   return (
     <div className='flex items-center justify-center'>
@@ -173,36 +138,23 @@ const Unstructured = () => {
           <div className='flex items-center gap-2 py-4'>
             <Input
               placeholder='Filter apps...'
-              value={
-                (table.getColumn('item_name')?.getFilterValue() as string) ?? ''
-              }
-              onChange={(event) =>
-                table.getColumn('item_name')?.setFilterValue(event.target.value)
-              }
+              value={(table.getColumn('item_name')?.getFilterValue() as string) ?? ''}
+              onChange={(event) => table.getColumn('item_name')?.setFilterValue(event.target.value)}
               className='max-w-sm'
             />
-            {directoryStack.length > 0 && (
-              <Button onClick={handleBackClick}>Back</Button>
-            )}
+            {directoryStack.length > 0 && <Button onClick={handleBackClick}>Back</Button>}
             {/* Download Button */}
             <DownloadDialog
               selectedItems={selectedRows.map((row) => row.item_id)}
               trigger={
-                <Button
-                  variant={selectedRows.length > 0 ? 'default' : 'outline'}
-                  disabled={selectedRows.length === 0}
-                >
+                <Button variant={selectedRows.length > 0 ? 'default' : 'outline'} disabled={selectedRows.length === 0}>
                   <DownloadIcon className='mr-2 h-4 w-4' />
                   Download
                 </Button>
               }
             />
             {/* Reset Button */}
-            <Button
-              variant='outline'
-              disabled={selectedRows.length === 0}
-              onClick={() => table.resetRowSelection()}
-            >
+            <Button variant='outline' disabled={selectedRows.length === 0} onClick={() => table.resetRowSelection()}>
               <RefreshCcw className='mr-2 h-4 w-4' />
               Reset
             </Button>
@@ -217,10 +169,7 @@ const Unstructured = () => {
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
                       );
                     })}
@@ -230,27 +179,15 @@ const Unstructured = () => {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                      className='odd:bg-muted/50'
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'} className='odd:bg-muted/50'>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
+                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className='h-24 text-center'
-                    >
+                    <TableCell colSpan={columns.length} className='h-24 text-center'>
                       No results.
                     </TableCell>
                   </TableRow>
