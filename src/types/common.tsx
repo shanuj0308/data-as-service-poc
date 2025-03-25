@@ -264,3 +264,12 @@ export interface LegalHoldListItem {
   legal_hold_name?: string;
   bucket_name?: string;
 }
+
+export interface RetentionPolicyListItem {
+  id: string;
+  archive_name: string;
+  expiration_date?: string;
+  retention_policy?: string;
+  retention_type?: string;
+  bucket_name?: string;
+}

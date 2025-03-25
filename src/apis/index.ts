@@ -6,6 +6,7 @@ import {
   Application,
   CreateJobData,
   LegalHoldListItem,
+  RetentionPolicyListItem,
   S3BucketObject,
   SourceConnectionsData,
   TargetConnectionsData,
@@ -143,4 +144,19 @@ export const downloadSummaryReport = async (
   const payload = { data: selectedArchives };
   const response = await axiosInstance.post('archive/SummaryreportRL', payload, { responseType: 'blob' });
   return response.data;
+};
+
+// Retention Policy Dev APIs
+
+export const getRetentionPolicyList = async () => {
+  return (await axiosInstance.get<{ data: RetentionPolicyListItem[] }>('archive/retention/view')).data.data;
+};
+
+export const applyRetentionPolicy = async (data: { archive_id: string; policy_name: string; created_by: string }) => {
+  const payload = {
+    archive_id: data.archive_id,
+    policy_name: data.policy_name,
+    created_by: data.created_by,
+  };
+  return await axiosInstance.put('archive/retention/apply', payload);
 };

@@ -60,6 +60,16 @@ export default function NavigationMenuWithDropdown() {
           </NavigationMenuLink>
         </NavigationMenuItem>
 
+        {/* Retention Policy button */}
+        <NavigationMenuItem>
+          <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+            <Link to='/apply-retention-policy'>
+              <FileText className='mr-2 h-5 w-5' />
+              Retention Policy
+            </Link>
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
         {/* Summary Report button */}
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>

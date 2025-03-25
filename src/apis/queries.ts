@@ -6,6 +6,7 @@ import {
   getJobList,
   getLegalHold,
   getLegalHoldList,
+  getRetentionPolicyList,
   getSourceConnection,
   getSourceConnections,
   getTargetConnection,
@@ -93,6 +94,14 @@ export const useRetentionPolicyList = () => {
     queryKey: ['retentionPolicyList'],
     queryFn: getRetentionPolicies,
     staleTime: 1000 * 60 * 5, // 5 min in milliseconds new data will not be fetched
+  });
+};
+
+export const useRetentionPolicyApplicationList = () => {
+  return useQuery({
+    queryKey: ['retentionPolicyApplicationList'],
+    queryFn: getRetentionPolicyList,
+    staleTime: 1000 * 60 * 5,
   });
 };
 

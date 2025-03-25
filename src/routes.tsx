@@ -24,6 +24,8 @@ import Login from '@/pages/Login';
 import Profile from '@/pages/Profile';
 import Reporting from '@/pages/Reporting';
 import ListUnstructuredData from '@/pages/Unstructured/List';
+import ApplyRetentionPolicy from './pages/Retention/ApplyRetentionPolicy';
+import ApplyRetentionPolicyForm from './pages/Retention/ApplyRetentionPolicyForm';
 
 const LoginRoute = createBrowserRouter([
   {
@@ -131,6 +133,14 @@ const AuthorizedRoutes = createBrowserRouter([
       {
         path: '/summary-report',
         element: <SummaryReportPage />,
+      },
+      {
+        path: '/apply-retention-policy',
+        element: <ApplyRetentionPolicy />,
+      },
+      {
+        path: '/apply-retention-policy/form',
+        element: <ApplyRetentionPolicyForm />,
       },
     ],
   },

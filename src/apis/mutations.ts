@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { applyRetentionPolicy } from '@/apis';
 import {
   applyLegalHold,
   createLegalHold,
@@ -452,6 +453,24 @@ export const useDownloadS3Files = () => {
         variant: 'default',
         title: 'File downloaded successfully.',
       });
+    },
+  });
+};
+
+// Apply Retention Policy
+export const useApplyRetentionPolicy = () => {
+  const queryClient = useQueryClient();
+  const username = useUsername();
+
+  return useMutation({
+    mutationFn: (data: { archive_id: string; policy_name: string }) => {
+      return applyRetentionPolicy({
+        ...data,
+        created_by: username || 'unknown',
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['retentionPolicyApplicationList'] });
     },
   });
 };
