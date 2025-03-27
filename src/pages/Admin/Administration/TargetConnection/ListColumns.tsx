@@ -17,9 +17,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ADMIN_DEVELOPER_ROLE } from '@/constant/secret';
 import { TargetConnectionsData } from '@/types/common';
 
-export const columns: ColumnDef<TargetConnectionsData>[] = [
+export const columns = (highestRole: string | null): ColumnDef<TargetConnectionsData>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -80,11 +81,11 @@ export const columns: ColumnDef<TargetConnectionsData>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>View connection</DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link to={`/target-connection/edit/${connectionData.connection_name}/${connectionData.bucket_name}`}>
-                Edit connection
-              </Link>
-            </DropdownMenuItem>
+            {highestRole && highestRole === ADMIN_DEVELOPER_ROLE[0] && (
+              <DropdownMenuItem>
+                <Link to={`/target-connection/edit/${connectionData.connection_name}`}>Edit connection</Link>
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

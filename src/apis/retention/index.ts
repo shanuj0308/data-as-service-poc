@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { BASE_URL } from '@/constant/secret';
+import { getCookie } from '@/lib/utils';
 import { RetentionPolicy } from '@/types/common';
 
 const axiosInstance = axios.create({
@@ -9,6 +10,19 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Add interceptor to attach idToken from cookie
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const idToken = getCookie('idToken');
+    const accessToken = getCookie('accessToken');
+    if (idToken) {
+      config.headers.Authorization = `idToken ${idToken}||accessToken ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 /**
  * Get all Retention policy lists

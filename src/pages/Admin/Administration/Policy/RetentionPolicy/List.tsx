@@ -5,11 +5,13 @@ import { columns } from './ListColumns';
 import { ListTable } from './ListTable';
 
 import { useRetentionPolicyList } from '@/apis/queries';
-import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import useLoggedInUserRole from '@/hooks/useLoggedInUserRole';
 
 export default function ListRetentionPolicy() {
   const retentionList = useRetentionPolicyList();
+  const { highestRole } = useLoggedInUserRole();
 
   if (retentionList.isFetching) {
     return (
@@ -29,14 +31,14 @@ export default function ListRetentionPolicy() {
           <h1 className='text-2xl font-medium leading-10 tracking-tight sm:text-3xl md:text-[30px] md:leading-[3.25rem]'>
             Retention Policies
           </h1>
-          <Link to='/retention-policy/add' className={buttonVariants({ variant: 'outline' })}>
-            Add Policies
-          </Link>
+          <Button variant={'outline'} user_role={highestRole}>
+            <Link to='/retention-policy/add'>Add Policies</Link>
+          </Button>
         </div>
         <Separator />
         <div className='w-full'>
           <div className='flex items-center justify-center gap-2 py-4'>
-            <ListTable columns={columns} filterCol='policy_name' data={retentionList.data ?? []} />
+            <ListTable columns={columns(highestRole)} filterCol='policy_name' data={retentionList.data ?? []} />
           </div>
         </div>
       </div>

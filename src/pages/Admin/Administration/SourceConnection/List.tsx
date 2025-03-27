@@ -5,11 +5,14 @@ import { columns } from './ListColumns';
 import { ListTable } from './ListTable';
 
 import { useSourceConnectionList } from '@/apis/queries';
-import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { connectionDataColumns } from '@/constant/apiConstants';
+import useLoggedInUserRole from '@/hooks/useLoggedInUserRole';
+
 export default function ListSourceConnection() {
   const connectionList = useSourceConnectionList();
+  const { highestRole } = useLoggedInUserRole();
 
   if (connectionList.isFetching) {
     return (
@@ -29,15 +32,15 @@ export default function ListSourceConnection() {
           <h1 className='text-2xl font-medium leading-10 tracking-tight sm:text-3xl md:text-[30px] md:leading-[3.25rem]'>
             Source Connections
           </h1>
-          <Link to='/source-connection/add' className={buttonVariants({ variant: 'outline' })}>
-            Add Connection
-          </Link>
+          <Button variant={'outline'} user_role={highestRole}>
+            <Link to='/source-connection/add'>Add Connection</Link>
+          </Button>
         </div>
         <Separator />
         <div className='w-full'>
           <div className='flex items-center justify-center gap-2 py-4'>
             <ListTable
-              columns={columns}
+              columns={columns(highestRole)}
               filterCol={connectionDataColumns.CONNECTION_NAME}
               data={connectionList.data ?? []}
             />

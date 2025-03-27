@@ -1,12 +1,10 @@
 // src/pages/ApplyRetentionPolicy.tsx
 import { Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 import { columns } from './ListColumns';
-import { ListTable } from './ListTable'
+import { ListTable } from './ListTable';
 
 import { useRetentionPolicyApplicationList } from '@/apis/queries';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
 export default function ApplyRetentionPolicy() {
@@ -30,9 +28,6 @@ export default function ApplyRetentionPolicy() {
           <h1 className='text-2xl font-medium leading-10 tracking-tight sm:text-3xl md:text-[30px] md:leading-[3.25rem]'>
             Retention Policy Management
           </h1>
-          <Button asChild>
-            <Link to="/apply-retention-policy/form">Apply Retention Policy</Link>
-          </Button>
         </div>
         <Separator />
         <div className='w-full'>

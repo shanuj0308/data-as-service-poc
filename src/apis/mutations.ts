@@ -375,11 +375,14 @@ export const useUpdateRetention = () => {
   const useClient = useQueryClient();
   return useMutation({
     mutationFn: (data: RetentionPolicy) => updateRetentionPolicy(data),
-    onError: () => {
+    onError: (error) => {
       toast({
         variant: 'destructive',
         title: 'Error saving retention.',
-        description: 'Error while saving the retention. Please try again.',
+        description:
+          axios.isAxiosError(error) && error.response
+            ? error.response.data
+            : 'Error while updating the retention. Please try again.',
       });
     },
     onSuccess: () => {
@@ -407,12 +410,15 @@ export const useDeleteRetention = () => {
     onMutate: () => {
       console.log('Mutate');
     },
-    onError: () => {
+    onError: (error) => {
       console.log('Error');
       toast({
         variant: 'destructive',
         title: 'Error deleting retention.',
-        description: 'Error while deleting the retention. Please try again.',
+        description:
+          axios.isAxiosError(error) && error.response
+            ? error.response.data
+            : 'Error while deleting the retention. Please try again.',
       });
     },
     onSuccess: () => {

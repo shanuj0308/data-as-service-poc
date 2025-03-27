@@ -1,4 +1,5 @@
 // src/pages/Admin/Administration/LegalHold/List.tsx
+// DONT DELETE AS THIS MODULE.COULD BE PICKED UP IN PHASE 2.. HAVING CUSTOM LEGAL HOLD
 import { Loader2 } from 'lucide-react';
 
 import { columns } from './ListColumns';

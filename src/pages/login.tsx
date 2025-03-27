@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { setCookie } from '@/lib/utils';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -25,13 +26,21 @@ const Login = () => {
   /* Checking if user logged in */
   const { instance, inProgress } = useMsal();
 
-  const handleLoginRedirect = () => {
-    instance
-      .loginPopup({
+  const handleLoginRedirect = async () => {
+    try {
+      const response = await instance.loginPopup({
         ...loginRequest,
         prompt: 'create',
-      })
-      .catch((error) => console.log(error));
+      });
+      const idToken = response.idToken;
+      const accessToken = response.accessToken;
+      if (idToken) {
+        setCookie('idToken', idToken, 1); // Store for 1 hour
+        setCookie('accessToken', accessToken, 1);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   const form = useForm<z.infer<typeof formSchema>>({

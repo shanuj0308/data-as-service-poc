@@ -35,50 +35,12 @@ describe('RunJobModal', () => {
   it('validates workerType is required', async () => {
     render(<RunJobModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
 
-    const submitButton = screen.getByRole('button', { name: /Run Job/i });
-    fireEvent.click(submitButton);
+    fireEvent.click(screen.getByRole('button', { name: /Run Job/i }));
 
     await waitFor(() => {
       expect(screen.getByText('Worker type is required')).toBeInTheDocument();
     });
     expect(mockOnSubmit).not.toHaveBeenCalled();
-  });
-
-  it('validates capacity input', async () => {
-    render(<RunJobModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
-
-    const capacityInput = screen.getByPlaceholderText('Enter maximum capacity');
-    fireEvent.change(capacityInput, { target: { value: '-5' } });
-
-    const submitButton = screen.getByRole('button', { name: /Run Job/i });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Worker type is required/i)).toBeInTheDocument();
-    });
-
-    fireEvent.change(capacityInput, { target: { value: '10' } });
-
-    fireEvent.click(submitButton);
-    await waitFor(() => {
-      expect(screen.getByText(/Worker type is required/i)).toBeInTheDocument();
-    });
-
-    expect(mockOnSubmit).not.toHaveBeenCalled();
-  });
-
-  it('resets form when modal is closed and reopened', async () => {
-    const { rerender } = render(<RunJobModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
-
-    const capacityInput = screen.getByPlaceholderText('Enter maximum capacity');
-    fireEvent.change(capacityInput, { target: { value: '5' } });
-
-    rerender(<RunJobModal isOpen={false} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
-
-    rerender(<RunJobModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
-
-    const resetCapacityInput = screen.getByPlaceholderText('Enter maximum capacity');
-    expect(resetCapacityInput).toHaveValue(2);
   });
 
   it('defaults to "Run Now" and disables Schedule option', () => {
@@ -98,5 +60,15 @@ describe('RunJobModal', () => {
 
     expect(mockOnClose).toHaveBeenCalled();
     expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('does not submit the form if workerType is not selected', async () => {
+    render(<RunJobModal isOpen={true} onClose={mockOnClose} onSubmit={mockOnSubmit} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /Run Job/i }));
+
+    await waitFor(() => {
+      expect(mockOnSubmit).not.toHaveBeenCalled();
+    });
   });
 });

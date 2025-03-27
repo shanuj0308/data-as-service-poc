@@ -4,22 +4,23 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { useCreateJob } from '../../apis/mutations';
-import { useSourceConnectionList, useTargetConnectionList } from '../../apis/queries';
+import { useRetentionPolicyList, useSourceConnectionList, useTargetConnectionList } from '../../apis/queries';
 import { toast } from '../../components/ui/use-toast';
 import JobForm from '../../pages/JobListing/JobForm';
 
 const mockMutate = jest.fn();
 
-jest.mock('@/apis/mutations', () => ({
+jest.mock('../../apis/mutations', () => ({
   useCreateJob: jest.fn(),
 }));
 
-jest.mock('@/apis/queries', () => ({
+jest.mock('../../apis/queries', () => ({
   useSourceConnectionList: jest.fn(),
   useTargetConnectionList: jest.fn(),
+  useRetentionPolicyList: jest.fn(),
 }));
 
-jest.mock('@/components/ui/use-toast', () => ({
+jest.mock('../../components/ui/use-toast', () => ({
   toast: jest.fn(),
 }));
 
@@ -43,27 +44,12 @@ describe('JobForm Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    Element.prototype.scrollIntoView = jest.fn();
-    (useCreateJob as jest.Mock).mockReturnValue({
-      mutate: mockMutate,
-      isLoading: false,
-      isError: false,
-      error: null,
-    });
-
-    (useSourceConnectionList as jest.Mock).mockReturnValue({
-      data: mockSourceConnections,
-      isLoading: false,
-      isError: false,
-    });
-
-    (useTargetConnectionList as jest.Mock).mockReturnValue({
-      data: mockTargetConnections,
-      isLoading: false,
-      isError: false,
-    });
-
+    (useCreateJob as jest.Mock).mockReturnValue({ mutate: mockMutate });
+    (useSourceConnectionList as jest.Mock).mockReturnValue({ data: mockSourceConnections, isLoading: false });
+    (useTargetConnectionList as jest.Mock).mockReturnValue({ data: mockTargetConnections, isLoading: false });
+    (useRetentionPolicyList as jest.Mock).mockReturnValue({ data: [], isLoading: false });
     (router.useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+
   });
 
   const renderJobForm = () => {
@@ -76,153 +62,88 @@ describe('JobForm Component', () => {
     );
   };
 
-  test('renders the form with all fields', () => {
+  test('renders the form with required fields', () => {
     renderJobForm();
-
-    expect(screen.getByLabelText(/project name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Archive Job Name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/SGRC ID/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/App Id/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/App Name/i)).toBeInTheDocument();
     expect(screen.getByText(/select source connection/i)).toBeInTheDocument();
     expect(screen.getByText(/select target connection/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByText(/select archival type/i)).toBeInTheDocument();
+    expect(screen.getByText(/select retention policy/i)).toBeInTheDocument();
+    expect(screen.getByText(/select legal hold/i)).toBeInTheDocument();
   });
 
   test('shows validation errors when submitting empty form', async () => {
     renderJobForm();
-
     fireEvent.click(screen.getByRole('button', { name: /submit/i }));
-
     await waitFor(() => {
-      expect(screen.getByText(/project name is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Archive Job Name should be like: JOB_STRUCT_APPID_APPNAME_V1.0/i)).toBeInTheDocument();
     });
   });
 
   test('submits the form with valid data', async () => {
     renderJobForm();
+    fireEvent.change(screen.getByLabelText(/Archive Job Name/i), { target: { value: 'JOB_STRUCT_APPID_APPNAME_V1.0' } });
+    fireEvent.change(screen.getByLabelText(/Description/i), { target: { value: 'Test Job Description' } });
+    fireEvent.change(screen.getByLabelText(/SGRC ID/i), { target: { value: 'SGRC123' } });
+    fireEvent.change(screen.getByLabelText(/App Id/i), { target: { value: 'APP123' } });
+    fireEvent.change(screen.getByLabelText(/App Name/i), { target: { value: 'Test App' } });
+       fireEvent.click(screen.getByText(/select source connection/i));
+    const sourceOption = await screen.findByText('source1');
+    fireEvent.click(sourceOption);
+    
+    fireEvent.click(screen.getByText(/select archival type/i));
+    const archivalOption = await screen.findByText('Structured');
+    fireEvent.click(archivalOption);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText(/project name/i)).toBeInTheDocument();
-    });
-
-    const projectNameInput = screen.getByLabelText(/project name/i);
-    fireEvent.change(projectNameInput, { target: { value: 'Test Project' } });
-
-    const sourceDropdown = screen.getByText(/select source connection/i);
-    fireEvent.click(sourceDropdown);
-
-    await waitFor(() => {
-      expect(screen.getByText('source1')).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByText('source1'));
-
-    const targetDropdown = screen.getByText(/select target connection/i);
-    fireEvent.click(targetDropdown);
-
-    await waitFor(() => {
-      expect(screen.getByText('target1')).toBeInTheDocument();
-    });
-
-    const submitButton = screen.getByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
-
-    if (mockMutate.mock.calls.length === 0) {
-      const formData = {
-        project_name: 'Test Project',
-        source_connection: 'source1',
-        target_connection: 'target1',
-      };
-
-      mockMutate(formData, {
-        onSuccess: () => {
-          mockNavigate('/jobs/list');
-          toast({
-            variant: 'default',
-            title: 'Job created successfully.',
-          });
-        },
-      });
-    }
-
-    await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalled();
-
-      const callData = mockMutate.mock.calls[0][0];
-      expect(callData).toHaveProperty('project_name', 'Test Project');
-
-      const options = mockMutate.mock.calls[0][1];
-      expect(options).toHaveProperty('onSuccess');
-
-      options.onSuccess();
-    });
-
+    fireEvent.click(screen.getByText(/select target connection/i));
+    const targetOption = await screen.findByText('target1');
+    fireEvent.click(targetOption);
+    
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
+    await waitFor(() => expect(mockMutate).toHaveBeenCalled());
+    
+    expect(mockMutate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          "app_id": "APP123", 
+          "app_name": "Test App",
+          "archival_type": "Structured",
+          "archive_name": "JOB_STRUCT_APPID_APPNAME_V1.0",
+          "created_by": "",
+          "description": "Test Job Description",
+          "legal_hold": "",
+          "retention_policy": "",
+          "sgrc_id": "SGRC123",
+          "source_name": "source1",
+          "target_name": "target1"}),
+        expect.any(Object)
+    );
+    
+    const options = mockMutate.mock.calls[0][1];
+    options.onSuccess();
+    
     expect(mockNavigate).toHaveBeenCalledWith('/jobs/list');
-    expect(toast).toHaveBeenCalledWith({
-      variant: 'default',
-      title: 'Job created successfully.',
-    });
-  });
+    expect(toast).toHaveBeenCalledWith({ title: 'Job submitted for creation.', variant: "default" });
+});
 
-  test('navigates back to job list on cancel', async () => {
+  test('navigates back to job list on cancel', () => {
     const { container } = renderJobForm();
     const link = container.querySelector('a[href="/jobs/list"]');
     expect(link).toBeInTheDocument();
   });
 
   test('shows error message when source connections fail to load', async () => {
-    (useSourceConnectionList as jest.Mock).mockReturnValue({
-      data: null,
-      isLoading: false,
-      isError: true,
-    });
-
+    (useSourceConnectionList as jest.Mock).mockReturnValue({ data: null, isError: true });
     renderJobForm();
-
-    expect(screen.getByText(/failed to load source connections/i)).toBeInTheDocument();
+    expect(screen.getByText(/Failed to load source connections/i)).toBeInTheDocument();
   });
 
   test('shows error message when target connections fail to load', async () => {
-    (useTargetConnectionList as jest.Mock).mockReturnValue({
-      data: null,
-      isLoading: false,
-      isError: true,
-    });
-
+    (useTargetConnectionList as jest.Mock).mockReturnValue({ data: null, isError: true });
     renderJobForm();
-
-    expect(screen.getByText(/failed to load target connections/i)).toBeInTheDocument();
-  });
-
-  test('calls onSubmit and navigates on successful job creation', async () => {
-    renderJobForm();
-
-    const projectNameInput = screen.getByLabelText(/project name/i);
-    fireEvent.change(projectNameInput, { target: { value: 'Test Project' } });
-
-    fireEvent.click(screen.getByText(/select source connection/i));
-    await waitFor(() => fireEvent.click(screen.getByText('source1')));
-
-    fireEvent.click(screen.getByText(/select target connection/i));
-    await waitFor(() => fireEvent.click(screen.getByText('target1')));
-
-    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
-
-    await waitFor(() => {
-      expect(mockMutate).toHaveBeenCalledWith(
-        { archive_name: 'Test Project', src_conn_name: 'source1', target_name: 'target1', created_by: '' },
-        expect.objectContaining({
-          onSuccess: expect.any(Function),
-          onError: expect.any(Function),
-        }),
-      );
-    });
-
-    // Simulate successful API response
-    const options = mockMutate.mock.calls[0][1];
-    options.onSuccess();
-
-    expect(mockNavigate).toHaveBeenCalledWith('/jobs/list');
-    expect(toast).toHaveBeenCalledWith({
-      variant: 'default',
-      title: 'Job submitted for creation.',
-    });
+    expect(screen.getByText(/Failed to load target connections/i)).toBeInTheDocument();
   });
 });

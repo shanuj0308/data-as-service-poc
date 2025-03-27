@@ -9,7 +9,6 @@ import { RunJobFormValues, RunJobModal } from './RunJob';
 
 import { useRunJob } from '@/apis/mutations';
 import { useJobDataList } from '@/apis/queries';
-import useUsername from '@/components/hooks/useUsername';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { jobTableConstants } from '@/constant/apiConstants';
+import useUsername from '@/hooks/useUsername';
 import { JobData } from '@/types/common';
 
 export default function JobList() {
@@ -44,7 +44,7 @@ export default function JobList() {
     // Implement your run job logic here
     const data = {
       archive_id: selectedJob.job_id,
-      worker_capacity: values.maxCapacity,
+      worker_capacity: 2,
       worker_type: values.workerType,
       archive_schedule: {
         run_now: values.runNow,
@@ -92,7 +92,6 @@ export default function JobList() {
                   {job.archive_status === 'Archive Queue' && (
                     <DropdownMenuItem onClick={() => openRunModal(job)}>Run Job</DropdownMenuItem>
                   )}
-                  {/* <DropdownMenuItem>Job Details</DropdownMenuItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -120,6 +119,7 @@ export default function JobList() {
               columns={columnsWithActions}
               filterCol={jobTableConstants.JOB_NAME}
               data={jobDataList.data ?? []}
+              refreshTable={jobDataList.refetch}
             />
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { RefreshCcw } from 'lucide-react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,6 +15,7 @@ import {
 
 import { DataTablePagination } from '@/components/reactTable/DataTablePagination';
 import { DataTableViewOptions } from '@/components/reactTable/DataTableViewOptions';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
@@ -21,9 +23,10 @@ type DataTableProps<TData, TValue> = {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterCol: string;
+  refreshTable: any;
 };
 
-export function ListTable<TData, TValue>({ columns, data, filterCol }: DataTableProps<TData, TValue>) {
+export function ListTable<TData, TValue>({ columns, data, filterCol, refreshTable }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -51,15 +54,22 @@ export function ListTable<TData, TValue>({ columns, data, filterCol }: DataTable
 
   return (
     <div className='w-full'>
-      <div className='flex items-center gap-2 py-4'>
+      <div className='flex items-center justify-between gap-2 py-4'>
         <Input
           placeholder={`Filter by Job Name`}
           value={(table.getColumn(filterCol)?.getFilterValue() as string) ?? ''}
           onChange={(event) => table.getColumn(filterCol)?.setFilterValue(event.target.value)}
           className='max-w-sm'
         />
-        <DataTableViewOptions table={table} />
+        <div className='flex gap-2 py-4'>
+          <Button type='button' variant='outline' size='sm' className='ml-auto hidden h-8 lg:flex' onClick={refreshTable}>
+            <RefreshCcw className=' h-4 w-4' />
+            Refresh Jobs List
+          </Button>
+          <DataTableViewOptions table={table} />
+        </div>
       </div>
+      <div></div>
       <div className='rounded-md border'>
         <Table>
           <TableHeader>

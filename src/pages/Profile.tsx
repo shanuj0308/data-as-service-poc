@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  AccountInfo,
-  InteractionRequiredAuthError,
-  InteractionStatus,
-} from '@azure/msal-browser';
+import { AccountInfo, InteractionRequiredAuthError, InteractionStatus } from '@azure/msal-browser';
 import { useMsal } from '@azure/msal-react';
 
 import { loginRequest } from '@/auth/authConfig';
@@ -36,9 +32,6 @@ const Profile = () => {
     }
   }, [inProgress, graphData, instance]);
 
-  return (
-    // {graphData !== null && <ProfileData graphData={graphData} />}
-    <ProfileData graphData={graphData} />
-  );
+  return <ProfileData graphData={graphData} />;
 };
 export default Profile;

@@ -1,7 +1,7 @@
 // src/components/common/NavigationMenuWithDropdown.tsx
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { FileBadge, FileText, User, UserCog2 } from 'lucide-react';
+import { Cog, FileBadge, FileText, User, UserCog2 } from 'lucide-react';
 
 import {
   NavigationMenu,
@@ -35,7 +35,7 @@ export default function NavigationMenuWithDropdown() {
         <NavigationMenuItem>
           <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
             <Link to='/jobs/list'>
-              <UserCog2 className='mr-2 h-5 w-5' />
+              <Cog className='mr-2 h-5 w-5' />
               Jobs
             </Link>
           </NavigationMenuLink>

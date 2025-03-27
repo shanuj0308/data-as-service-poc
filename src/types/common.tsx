@@ -1,7 +1,7 @@
 // src/types/common.tsx
 import * as z from 'zod';
 
-import { noSpecialCharacters, validS3BucketName } from '@/lib/utils';
+import { noSpecialCharacters, noSpecialCharactersOrSpaces, validS3BucketName } from '@/lib/utils';
 
 export type GraphData = {
   displayName: string;
@@ -22,8 +22,15 @@ export type ArchivedData = {
 
 export type CreateJobData = {
   archive_name: string;
-  src_conn_name: string;
+  source_name: string;
   target_name: string;
+  sgrc_id: string;
+  retention_policy: string;
+  legal_hold: string;
+  description: string;
+  created_by: string;
+  app_name: string;
+  archival_type: string;
 };
 
 export type TargetConnectionsData = {
@@ -110,10 +117,17 @@ export const SourceFormSchema = z.object({
 });
 
 export const JobFormSchema = z.object({
-  archive_name: z.string().min(1, { message: 'Project name is required' }),
-  src_conn_name: z.string().min(1, { message: 'Source connection is required' }),
+  archive_name: noSpecialCharactersOrSpaces,
+  source_name: z.string().min(1, { message: 'Source connection is required' }),
   target_name: z.string().min(1, { message: 'Target connection is required' }),
   created_by: z.string(),
+  description: z.string(),
+  sgrc_id: z.string().min(1, { message: 'SGRC Id is required' }),
+  app_id: z.string(),
+  app_name: z.string().min(1, { message: 'App Name is required' }),
+  archival_type: z.string().min(1, { message: 'Archival Type is required' }),
+  retention_policy: z.string(),
+  legal_hold: z.string(),
 });
 
 export const TargetFormSchema = z.object({
@@ -226,6 +240,16 @@ export type JobData = ArchivalData & {
   end_time: any;
   start_time: any;
   duration: any;
+};
+
+export type JobDataList = {
+  end_time: any;
+  start_time: any;
+  duration: any;
+  job_name: any;
+  archive_status: any;
+  triggered_by: any;
+  job_id: any;
 };
 
 export type JobRunData = {

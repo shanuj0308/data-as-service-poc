@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,10 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 // Define the schema for the form
 const RunJobSchema = z.object({
   runNow: z.boolean().default(true),
-  workerType: z.string().min(1, 'Worker type is required'),
-  maxCapacity: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 1 && Number(val) < 100, {
-    message: 'Maximum capacity must be a positive number > 2',
-  }).default('2'),
+  workerType: z.string().min(1, 'Worker type is required')
 });
 
 export type RunJobFormValues = z.infer<typeof RunJobSchema>;
@@ -35,7 +31,6 @@ export function RunJobModal({ isOpen, onClose, onSubmit, jobName }: RunJobModalP
     defaultValues: {
       runNow: true,
       workerType: '',
-      maxCapacity: '2',
     },
   });
 
@@ -44,8 +39,7 @@ export function RunJobModal({ isOpen, onClose, onSubmit, jobName }: RunJobModalP
     if (!isOpen) {
       form.reset({
         runNow: true,
-        workerType: '',
-        maxCapacity: '2',
+        workerType: ''
       });
     }
   }, [isOpen, form]);
@@ -119,19 +113,6 @@ export function RunJobModal({ isOpen, onClose, onSubmit, jobName }: RunJobModalP
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name='maxCapacity'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Worker Maximum Capacity</FormLabel>
-                    <FormControl>
-                      <Input type='number' placeholder='Enter maximum capacity' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <DialogFooter className='flex justify-between'>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { BASE_URL } from '@/constant/secret';
-import { convertToObject } from '@/lib/utils';
+import { convertToObject, getCookie } from '@/lib/utils';
 import {
   Application,
   CreateJobData,
@@ -18,6 +18,19 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Add interceptor to attach idToken from cookie
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const idToken = getCookie('idToken');
+    const accessToken = getCookie('accessToken');
+    if (idToken) {
+      config.headers.Authorization = `idToken ${idToken}||accessToken ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 type SourceQueryKey = ['sourceConData', { connection_name: string }];
 type TargetQueryKey = ['targetConData', { connection_name: string; bucket_name: string }];

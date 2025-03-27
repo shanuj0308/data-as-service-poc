@@ -13,6 +13,61 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/use-toast';
 import { S3ObjectList } from '@/types/common';
 
+// Export handleDownload for testing
+export const handleDownload = async (
+  itemsToDownload: S3ObjectList[],
+  downloadS3Files: ReturnType<typeof useDownloadS3Files>,
+) => {
+  const selected_files = itemsToDownload.map((item) => item.s3_path);
+
+  toast({ title: 'Download triggered' });
+  const payload = { bucketName: itemsToDownload[0].bucketName, selected_files };
+  try {
+    const res = await new Promise<{ url: string }>((resolve, reject) => {
+      downloadS3Files.mutate(payload, {
+        onSuccess: (res) => resolve(res),
+        onError: (err) => reject(err),
+      });
+    });
+
+    toast({ title: 'Download started' });
+
+    // Check if File System Access API is supported
+    if ('showSaveFilePicker' in window) {
+      // Prompt user to select save location
+      const fileHandle = await (window as any).showSaveFilePicker({
+        suggestedName: 'download.zip', // Default file name
+        types: [
+          {
+            description: 'ZIP Archive',
+            accept: { 'application/zip': ['.zip'] },
+          },
+        ],
+      });
+
+      // Fetch the file from the URL
+      const response = await fetch(res.url);
+      const blob = await response.blob();
+
+      // Write the file to the selected location
+      const writable = await fileHandle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+    } else {
+      // Fallback to default browser download
+      const link = document.createElement('a');
+      link.href = res.url;
+      link.download = 'download.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (error) {
+    toast({ title: 'Download failed', variant: 'destructive' });
+    console.error('Download error:', error);
+  }
+};
+
 export default function ListUnstructuredData() {
   const { archive_id: archiveId } = useParams();
   const [pathHistory, setPathHistory] = useState<string[]>(['']);
@@ -31,41 +86,14 @@ export default function ListUnstructuredData() {
     }
   };
 
-  // handleDownload
-  const handleDownload = (itemsToDownload: S3ObjectList[]) => {
-    const selected_files = itemsToDownload.map((item) => {
-      return item.s3_path;
-    });
-
-    toast({ title: 'Download triggered' });
-    const payload = { bucketName: itemsToDownload[0].bucketName, selected_files };
-    downloadS3Files.mutate(payload, {
-      onSuccess: (res: { url: string }) => {
-        toast({ title: 'Download started' });
-        // / Create a hidden <a> element
-        const link = document.createElement('a');
-        link.href = res.url;
-        link.download = 'download.zip';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      },
-      onError: () => {
-        toast({ title: 'Download failed', variant: 'destructive' });
-      },
-    });
-  };
-
   // Handle download for multiple selected rows
   const handleDownloadSelected = (selectedRows: S3ObjectList[]) => {
-    console.log('🚀 ~ handleDownloadSelected ~ selectedRows:', selectedRows);
-    handleDownload(selectedRows);
+    handleDownload(selectedRows, downloadS3Files);
   };
 
   // Handle download for a single file
   const handleDownloadSingle = (file: S3ObjectList) => {
-    console.log('🚀 ~ handleDownloadSingle ~ file:', file);
-    handleDownload([file]);
+    handleDownload([file], downloadS3Files);
   };
 
   if (unstructuredList.isFetching) {

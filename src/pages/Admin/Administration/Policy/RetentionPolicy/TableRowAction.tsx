@@ -14,9 +14,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ADMIN_DEVELOPER_ROLE } from '@/constant/secret';
 import { RetentionPolicy } from '@/types/common';
 
-export function DataTableRowActions({ row }: { row: RetentionPolicy }) {
+export function DataTableRowActions({ row, highestRole }: { row: RetentionPolicy; highestRole: string | null }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const policy_name = row.policy_name;
   const retentionData = row;
@@ -42,19 +43,23 @@ export function DataTableRowActions({ row }: { row: RetentionPolicy }) {
           <DropdownMenuItem onClick={() => navigator.clipboard.writeText(retentionData.policy_name)}>
             Copy retention name
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link to={`/retention-policy/edit/${retentionData.policy_name}`}>Edit policy</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem className='font-base group flex w-full items-center justify-between p-0 text-left text-sm text-neutral-500'>
-            <button
-              onClick={() => {
-                setIsDeleteOpen(true);
-              }}
-              className='flex w-full justify-start rounded-md p-2 text-red-500 transition-all duration-75 hover:bg-neutral-100'
-            >
-              Delete Policy
-            </button>
-          </DropdownMenuItem>
+          {highestRole && highestRole === ADMIN_DEVELOPER_ROLE[0] && (
+            <>
+              <DropdownMenuItem>
+                <Link to={`/retention-policy/edit/${retentionData.policy_name}`}>Edit policy</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className='font-base group flex w-full items-center justify-between p-0 text-left text-sm text-neutral-500'>
+                <button
+                  onClick={() => {
+                    setIsDeleteOpen(true);
+                  }}
+                  className='flex w-full justify-start rounded-md p-2 text-red-500 transition-all duration-75 hover:bg-neutral-100'
+                >
+                  Delete Policy
+                </button>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

@@ -5,13 +5,13 @@ import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { useCreateJob } from '@/apis/mutations';
-import { useSourceConnectionList, useTargetConnectionList } from '@/apis/queries';
-import useUsername from '@/components/hooks/useUsername';
+import { useRetentionPolicyList, useSourceConnectionList, useTargetConnectionList } from '@/apis/queries';
 import { Button } from '@/components/ui/button';
 import Combobox from '@/components/ui/combobox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/components/ui/use-toast';
+import useUsername from '@/hooks/useUsername';
 import { JobFormSchema } from '@/types/common';
 
 export default function JobForm() {
@@ -22,9 +22,16 @@ export default function JobForm() {
 
   const defaultValues = {
     archive_name: '',
-    src_conn_name: '',
+    description: '',
+    sgrc_id: '',
+    app_id: '',
+    app_name: '',
+    archival_type: '',
+    source_name: '',
     target_name: '',
     created_by: '',
+    retention_policy: '',
+    legal_hold: '',
   };
 
   const form = useForm<z.infer<typeof JobFormSchema>>({
@@ -36,10 +43,12 @@ export default function JobForm() {
   // Fetch dropdown options using TanStack Query
   const { data: sourceConnections, isLoading: isSourceLoading, isError: isSourceError } = useSourceConnectionList();
   const { data: targetConnections, isLoading: isTargetLoading, isError: isTargetError } = useTargetConnectionList();
+  const { data: retentionPolicy, isLoading: isRetentionLoading, isError: isRetentionError } = useRetentionPolicyList();
 
   if (username) {
     setValue('created_by', username);
   }
+
   function onSubmit(values: z.infer<typeof JobFormSchema>) {
     try {
       console.log(values);
@@ -73,10 +82,85 @@ export default function JobForm() {
             name='archive_name'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Project Name</FormLabel>
+                <FormLabel>Archive Job Name</FormLabel>
                 <FormControl>
-                  <Input className='w-[500px]' placeholder='Please enter project name' type='text' {...field} />
+                  <Input className='w-[500px]' placeholder='Please enter archive job name' type='text' {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name='description'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input className='w-[500px]' placeholder='Please enter description' type='text' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name='sgrc_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>SGRC ID</FormLabel>
+                <FormControl>
+                  <Input className='w-[500px]' placeholder='Please enter sgrc id' type='text' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name='app_id'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>App Id</FormLabel>
+                <FormControl>
+                  <Input className='w-[500px]' placeholder='Please enter app id' type='text' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name='app_name'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>App Name</FormLabel>
+                <FormControl>
+                  <Input className='w-[500px]' placeholder='Please enter app name' type='text' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Archival Type Combobox */}
+          <FormField
+            control={control}
+            name='archival_type'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Archival Type</FormLabel>
+                <Combobox
+                  label='Archival Type'
+                  items={['Structured', 'Unstructured']}
+                  selectedValue={field.value}
+                  setSelectedValue={field.onChange}
+                  width={500}
+                />
                 <FormMessage />
               </FormItem>
             )}
@@ -85,7 +169,7 @@ export default function JobForm() {
           {/* Source Connection Combobox */}
           <FormField
             control={control}
-            name='src_conn_name'
+            name='source_name'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Source Connection</FormLabel>
@@ -126,12 +210,53 @@ export default function JobForm() {
                     width={500}
                   />
                 )}
-
                 <FormMessage />
               </FormItem>
             )}
           />
 
+          {/* Retention Policy Combobox */}
+          <FormField
+            control={control}
+            name='retention_policy'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Retention Policy</FormLabel>
+                {isRetentionError ? (
+                  <p className='text-red-500'> Failed to Retention Policies. Please try again.</p>
+                ) : (
+                  <Combobox
+                    label='Retention Policy'
+                    items={retentionPolicy?.map((retention_policy) => retention_policy.policy_name) || []}
+                    selectedValue={field.value}
+                    setSelectedValue={field.onChange}
+                    isLoading={isRetentionLoading}
+                    width={500}
+                  />
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Legal Hold Policy Combobox */}
+          <FormField
+            control={control}
+            name='legal_hold'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Legal Hold</FormLabel>
+                <Combobox
+                  label='Legal Hold'
+                  items={['True', 'False']}
+                  selectedValue={field.value}
+                  setSelectedValue={field.onChange}
+                  width={500}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className='flex justify-center pt-4'>
             <Button style={{ width: '360px' }} type='submit' variant={'outline'}>
               Submit

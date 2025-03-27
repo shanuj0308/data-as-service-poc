@@ -53,6 +53,15 @@ export const noSpecialCharacters = z.string().regex(/^[a-zA-Z0-9\s+-.]+$/, {
   message: 'Special characters are not allowed',
 });
 
+
+/**
+ * No Special Characters on input box or spaces
+ * only allows letters, numbers, hyphens, dashes and periods
+ */
+export const noSpecialCharactersOrSpaces = z.string().regex(/^[a-zA-Z0-9._-]+$/, {
+  message: 'Archive Job Name should be like: JOB_STRUCT_APPID_APPNAME_V1.0',
+});
+
 /*
  * Filters an array of objects to include only unique objects based on a specified key.
  */
@@ -86,4 +95,27 @@ export const convertToObject = (input: S3BucketObject): S3ObjectList[] => {
   });
 
   return result;
+};
+
+/**
+ * Set cookies
+ */
+export const setCookie = (name: string, value: string, hours: number) => {
+  const date = new Date();
+  date.setTime(date.getTime() + hours * 60 * 60 * 1000);
+  const expires = `expires=${date.toUTCString()}`;
+  // document.cookie = `${name}=${value}; ${expires}; path=/; Secure; HttpOnly; SameSite=Strict`;
+  document.cookie = `${name}=${value}; ${expires}; path=/; SameSite=Strict`;
+};
+/**
+ * get cookies
+ */
+export const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    const cookieValue = parts.pop()?.split(';').shift();
+    return cookieValue ?? null;
+  }
+  return null;
 };

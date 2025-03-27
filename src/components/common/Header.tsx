@@ -4,10 +4,14 @@ import { AuthenticatedTemplate, useMsal } from '@azure/msal-react';
 
 import { useTheme } from '@/context/theme-provider';
 
-import NavigationMenuWithDropdown from '@/components/common/NavigationMenuWithDropdown';
+import { AdminMenu } from '@/components/common/RoleMenu/Admin';
+import { DeveloperMenu } from '@/components/common/RoleMenu/Developer';
+import { EndUserMenu } from '@/components/common/RoleMenu/EndUser';
 import { Button } from '@/components/ui/button';
+import useLoggedInUserRole from '@/hooks/useLoggedInUserRole';
 
 const Header = () => {
+  const { highestRole } = useLoggedInUserRole();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const isDark = theme === 'dark';
@@ -30,7 +34,9 @@ const Header = () => {
         <Link to='/'>
           <img src={isDark ? '/kenvue-logo-rgb.svg' : '/kenvue-logo-black-rgb.svg'} className='h-12' />
         </Link>
-        {activeAccount && <NavigationMenuWithDropdown />}
+        {activeAccount && highestRole === 'KVUEVAULT_DEV_ADMIN' && <AdminMenu />}
+        {activeAccount && highestRole === 'KVUEVAULT_DEV_DEVELOPER' && <DeveloperMenu />}
+        {activeAccount && highestRole === 'END_USER' && <EndUserMenu />}
         <div>
           <div className='mx-auto flex h-12 items-center justify-between px-4'>
             <AuthenticatedTemplate>

@@ -28,6 +28,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RetentionPolicyListItem } from '@/types/common';
 
+// RetentionPolicyDialog component remains the same...
 const RetentionPolicyDialog = React.memo(
   ({
     isOpen,
@@ -48,7 +49,7 @@ const RetentionPolicyDialog = React.memo(
 
     const handlePolicyChange = (value: string) => {
       setSelectedPolicy(value);
-      const policyDetails = retentionPolicies.data?.find(policy => policy.policy_name === value);
+      const policyDetails = retentionPolicies.data?.find((policy) => policy.policy_name === value);
       setSelectedPolicyDetails(policyDetails);
     };
 
@@ -63,14 +64,16 @@ const RetentionPolicyDialog = React.memo(
           </DialogHeader>
           <div className='space-y-4 py-4'>
             <div className='space-y-2'>
-              <Label htmlFor="policy">Retention Policy</Label>
+              <Label htmlFor='policy'>Retention Policy</Label>
               <Select value={selectedPolicy} onValueChange={handlePolicyChange}>
-                <SelectTrigger id="policy">
-                  <SelectValue placeholder="Select a policy" />
+                <SelectTrigger id='policy'>
+                  <SelectValue placeholder='Select a policy' />
                 </SelectTrigger>
                 <SelectContent>
                   {retentionPolicies.isLoading ? (
-                    <SelectItem value="loading" disabled>Loading policies...</SelectItem>
+                    <SelectItem value='loading' disabled>
+                      Loading policies...
+                    </SelectItem>
                   ) : (
                     retentionPolicies.data?.map((policy) => (
                       <SelectItem key={policy.policy_name} value={policy.policy_name}>
@@ -84,14 +87,24 @@ const RetentionPolicyDialog = React.memo(
 
             {selectedPolicyDetails && (
               <div className='rounded-md bg-muted p-3 text-sm'>
-                <p><strong>Policy Type:</strong> {selectedPolicyDetails.retention_type}</p>
+                <p>
+                  <strong>Policy Type:</strong> {selectedPolicyDetails.retention_type}
+                </p>
                 {selectedPolicyDetails.retention_period && (
-                  <p><strong>Retention Period:</strong> {selectedPolicyDetails.retention_period} {selectedPolicyDetails.retention_period_unit}</p>
+                  <p>
+                    <strong>Retention Period:</strong> {selectedPolicyDetails.retention_period}{' '}
+                    {selectedPolicyDetails.retention_period_unit}
+                  </p>
                 )}
                 {selectedPolicyDetails.exact_expiry_date && (
-                  <p><strong>Expiry Date:</strong> {new Date(selectedPolicyDetails.exact_expiry_date).toLocaleDateString()}</p>
+                  <p>
+                    <strong>Expiry Date:</strong>{' '}
+                    {new Date(selectedPolicyDetails.exact_expiry_date).toLocaleDateString()}
+                  </p>
                 )}
-                <p><strong>Description:</strong> {selectedPolicyDetails.description}</p>
+                <p>
+                  <strong>Description:</strong> {selectedPolicyDetails.description}
+                </p>
               </div>
             )}
           </div>
@@ -99,10 +112,7 @@ const RetentionPolicyDialog = React.memo(
             <Button variant='outline' onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              onClick={() => onApply(selectedPolicy)} 
-              disabled={isPending || !selectedPolicy}
-            >
+            <Button onClick={() => onApply(selectedPolicy)} disabled={isPending || !selectedPolicy}>
               {isPending ? 'Applying...' : 'Apply Policy'}
             </Button>
           </DialogFooter>
@@ -114,6 +124,7 @@ const RetentionPolicyDialog = React.memo(
 
 RetentionPolicyDialog.displayName = 'RetentionPolicyDialog';
 
+// ActionCell component remains the same...
 const ActionCell = React.memo(({ row }: { row: { original: RetentionPolicyListItem } }) => {
   const [showPolicyDialog, setShowPolicyDialog] = useState(false);
   const applyRetentionPolicy = useApplyRetentionPolicy();
@@ -130,7 +141,7 @@ const ActionCell = React.memo(({ row }: { row: { original: RetentionPolicyListIt
         onSuccess: () => {
           setShowPolicyDialog(false);
         },
-      }
+      },
     );
   };
 
@@ -149,13 +160,9 @@ const ActionCell = React.memo(({ row }: { row: { original: RetentionPolicyListIt
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           {hasRetentionPolicy ? (
-            <DropdownMenuItem disabled>
-              Update Retention Policy
-            </DropdownMenuItem>
+            <DropdownMenuItem disabled>Update Retention Policy</DropdownMenuItem>
           ) : (
-            <DropdownMenuItem onClick={() => setShowPolicyDialog(true)}>
-              Apply Retention Policy
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowPolicyDialog(true)}>Apply Retention Policy</DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -208,17 +215,38 @@ export const columns: ColumnDef<RetentionPolicyListItem>[] = [
   },
   {
     accessorKey: 'retention_policy',
-    header: 'Retention Policy',
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Retention Policy
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
     cell: ({ row }) => <span>{row.original.retention_policy || '-'}</span>,
   },
   {
     accessorKey: 'expiration_date',
-    header: 'Expiration Date',
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Expiration Date
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
     cell: ({ row }) => <span>{row.original.expiration_date || '-'}</span>,
   },
   {
     accessorKey: 'bucket_name',
-    header: 'Target Location',
+    header: ({ column }) => {
+      return (
+        <Button variant='ghost' onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Target Location
+          <ArrowUpDown className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
     cell: ({ row }) => <span>{row.original.bucket_name || '-'}</span>,
   },
   {

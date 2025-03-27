@@ -12,7 +12,7 @@ import { DataTableRowActions } from './TableRowAction';
 import { Button } from '@/components/ui/button';
 import { RetentionPolicy } from '@/types/common';
 
-export const columns: ColumnDef<RetentionPolicy>[] = [
+export const columns = (highestRole: string | null): ColumnDef<RetentionPolicy>[] => [
   {
     accessorKey: 'policy_name',
     header: ({ column }) => {
@@ -73,6 +73,6 @@ export const columns: ColumnDef<RetentionPolicy>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => <DataTableRowActions row={row.original} />,
+    cell: ({ row }) => <DataTableRowActions highestRole={highestRole} row={row.original} />,
   },
 ];

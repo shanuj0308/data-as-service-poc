@@ -2,6 +2,7 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Slot } from '@radix-ui/react-slot';
 
+import { ADMIN_DEVELOPER_ROLE } from '@/constant/secret';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -34,11 +35,15 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  user_role?: string | null;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, user_role, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button';
+
+    if (user_role && user_role !== ADMIN_DEVELOPER_ROLE[0]) return null;
+
     return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
   },
 );
